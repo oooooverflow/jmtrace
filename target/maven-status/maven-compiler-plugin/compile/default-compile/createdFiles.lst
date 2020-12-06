@@ -1,0 +1,6 @@
+org\njuws\Transformer.class
+org\njuws\Premain.class
+org\njuws\MyMethodVisitor.class
+org\njuws\MyClassVisitor.class
+org\njuws\MyLog.class
+org\njuws\App.class
