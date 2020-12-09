@@ -6,7 +6,7 @@ import org.objectweb.asm.Opcodes;
 
 public class MyClassVisitor extends ClassVisitor {
 	public MyClassVisitor(ClassVisitor cl) {
-		super(Opcodes.ASM9, cl);
+		super(Opcodes.ASM7, cl);
 	}
 
 	@Override

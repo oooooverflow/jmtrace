@@ -1,0 +1,5 @@
+#!/bin/bash
+#!./
+mvn package assembly:single
+rm target/jmtrace-1.0-SNAPSHOT.jar
+java -javaagent:target/jmtrace-1.0-SNAPSHOT-jar-with-dependencies.jar $@

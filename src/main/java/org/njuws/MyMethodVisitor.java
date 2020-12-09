@@ -2,51 +2,78 @@ package org.njuws;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 public class MyMethodVisitor extends MethodVisitor {
 	public MyMethodVisitor(MethodVisitor mv){
-		super(Opcodes.ASM9, mv);
-//		System.out.println("here!");
+		super(Opcodes.ASM7, mv);
 	}
 
 	@Override
 	public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-		if(mv == null) {
-			return;
-		}
 		switch(opcode) {
 			case Opcodes.GETSTATIC:
-//				System.out.println(MyLog.class.getCanonicalName());
 				mv.visitLdcInsn(owner);
 				mv.visitLdcInsn(name);
-//				.replace(".", "/")
-				mv.visitMethodInsn(Opcodes.INVOKESTATIC, MyLog.class.getCanonicalName().replace(".", "/"), "LogGetStatic",
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogGetStatic",
 						"(Ljava/lang/String;Ljava/lang/String;)V", false);
 				break;
-//			case Opcodes.PUTSTATIC:
-//				break;
-//			case Opcodes.GETFIELD:
-//				break;
-//			case Opcodes.PUTFIELD:
-//				break;
+			case Opcodes.PUTSTATIC:
+				mv.visitLdcInsn(owner);
+				mv.visitLdcInsn(name);
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogPutStatic",
+						"(Ljava/lang/String;Ljava/lang/String;)V", false);
+				break;
+			case Opcodes.GETFIELD:
+				mv.visitLdcInsn(owner);
+				mv.visitLdcInsn(name);
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogGetField",
+						"(Ljava/lang/String;Ljava/lang/String;)V", false);
+				break;
+			case Opcodes.PUTFIELD:
+				mv.visitLdcInsn(owner);
+				mv.visitLdcInsn(name);
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogPutField",
+						"(Ljava/lang/String;Ljava/lang/String;)V", false);
+				break;
 			default: break;
 		}
-//		System.out.print(opcode);
-//		System.out.print(' ');
-//		System.out.print(owner);
-//		System.out.print(' ');
-//		System.out.print(name);
-//		System.out.print(' ');
-//		System.out.print(descriptor);
-//		System.out.println();
 		super.visitFieldInsn(opcode, owner, name, descriptor);
-
 	}
 
 	@Override
 	public void visitInsn(int opcode) {
-//		System.out.println("here!");
+		switch(opcode) {
+			case Opcodes.IALOAD:case Opcodes.AALOAD:case Opcodes.SALOAD:case Opcodes.LALOAD:case Opcodes.FALOAD:case Opcodes.DALOAD:case Opcodes.BALOAD:case Opcodes.CALOAD:
+				mv.visitInsn(Opcodes.DUP2);
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogXaLoad",
+						"(Ljava/lang/Object;I)V", false);
+				break;
+			case Opcodes.IASTORE:case Opcodes.AASTORE:case Opcodes.SASTORE:case Opcodes.FASTORE:case Opcodes.BASTORE:case Opcodes.CASTORE:
+				mv.visitInsn(Opcodes.DUP_X2);
+				mv.visitInsn(Opcodes.POP);
+				mv.visitInsn(Opcodes.DUP2);
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogXaStore",
+						"(Ljava/lang/Object;I)V", false);
+				mv.visitInsn(Opcodes.DUP2_X1);
+				mv.visitInsn(Opcodes.POP2);
+				break;
+			case Opcodes.LASTORE:case Opcodes.DASTORE:
+				mv.visitInsn(Opcodes.DUP2_X2);
+				mv.visitInsn(Opcodes.POP2);
+				mv.visitInsn(Opcodes.DUP2);
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(MyLog.class), "LogLDaStore",
+						"(Ljava/lang/Object;I)V", false);
+				mv.visitInsn(Opcodes.DUP2_X2);
+				mv.visitInsn(Opcodes.POP2);
+				break;
+			default: break;
+		}
 		super.visitInsn(opcode);
-//		System.out.println(opcode);
+	}
+
+	@Override
+	public void visitMaxs(int maxStack, int maxLocals) {
+		super.visitMaxs(maxStack+4, maxLocals);
 	}
 }
